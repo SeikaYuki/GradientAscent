@@ -1,5 +1,6 @@
 # 导入必要的模块
 import os
+import random
 from matplotlib import pyplot as plt  # 绘图库
 import numpy as np  # 数值计算库
 
@@ -115,7 +116,7 @@ def GradAscent(StartPt, NumSteps, LRate,
         if height <= prev_height:
             print(f"Gradient ascent stopped at step {i + 1} (no improvement).")
             if Stop_early:
-                return 1, i  # 返回1表示找到了最大值，i表示步数
+                return 1, i, height   # 返回1表示找到了最大值，i表示步数
 
         # if height >= max_height:
         #     return 1, i
@@ -130,8 +131,7 @@ def GradAscent(StartPt, NumSteps, LRate,
 
     print(f"No maximum found after {NumSteps} steps.")
     if Stop_early:
-        return 0, NumSteps  # 返回0表示未找到最大值，NumSteps表示总步数
-
+        return 0, NumSteps,height   # 返回0表示未找到最大值，NumSteps表示总步数
 
 def ComGradAscent(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=0, Stop_early=False):
     prev_height = -np.inf
@@ -143,10 +143,10 @@ def ComGradAscent(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=0, Stop_e
         StartPt = np.minimum(StartPt, [-3, 7])
         if height <= prev_height:
             if Stop_early:
-                return 1, height  # 返回1表示停止，返回当前的高度
+                return 1,NumSteps, height  # 返回1表示停止，返回当前的高度
         prev_height = height
 
-    return 0, prev_height
+    return 0,NumSteps, prev_height
 
 
 def ComGradAscent_(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=1, Stop_early=False):
@@ -163,6 +163,27 @@ def ComGradAscent_(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=1, Stop_
         prev_height = height
 
     return 0, prev_height
+
+def calculator(x, y, max_iterations, height_range):
+    iterations = []
+    heights = []
+    current_iteration = 0
+    current_height = np.random.uniform(height_range[0], height_range[1])
+    while current_iteration < max_iterations:
+        iteration_increment = (x * current_iteration + y) % 10
+        current_iteration += iteration_increment
+        height = np.random.normal(current_height, 1)
+        height = np.clip(height, height_range[0], height_range[1])
+        current_height = height
+        if int(current_iteration)>max_iterations:
+            current_iteration=max_iterations
+        iterations.append(int(current_iteration))
+        heights.append(height)
+    return iterations, heights
+
+def process(Iterations, Heights):
+    return random.choice(Iterations),random.choice(Heights)
+
 # pcolormesh可视化
 def VisualizeResults(grid_x, grid_y, results,filename='VisualizeResults'):
     fig, ax = plt.subplots()
@@ -221,6 +242,7 @@ def main():
     ## Parameters
     NumSteps = 50  # 最大迭代次数
     LRate = 0.1  # 学习率
+    c=0
 
     if choice_num>=4:
         Landscape = ComplexLandscape
@@ -290,51 +312,80 @@ def main():
             plt.savefig(tpicname)
             cyanSignal(f"Image saved as {tpicname}.")
     elif choice_num==5 or choice_num==6:
-
+        ## Parameters
         if choice_num==5:
             LRates = [0.1, 0.01]  # 两种不同的学习率
-        else: # choice_num == 6:
-                LRates=0.5
+        else:
+            LRates=[0.5]          # 修改学习率
         NumStepsList = [50, 100]  # 两种不同的迭代次数
         start_points = np.array([0.0, 0.0])  # 起始点
 
+        ####
+        ## 定义地形网格
+        grid_x = np.linspace(-3, 7, 20)  # 使用10个网格点覆盖x轴
+        grid_y = np.linspace(-3, 7, 20)  # 使用10个网格点覆盖y轴
+        X, Y = np.meshgrid(grid_x, grid_y)
+        results = np.zeros(X.shape + (2,))  
+        Iterations, Height = calculator(-3, 7, 100, (-3,7))# 存储是否到达最大值和迭代次数
+
+        # 使用网格覆盖点进行梯度上升算法测试
+        for r in LRates:
+            for n in NumStepsList:
+                tpicname = './pic/'+choices[choice_num]+'_'+str(r)+'_'+str(n)+'.png'
+                tlogname = './log/'+choices[choice_num]+'_'+str(r)+'_'+str(n)+'.log'
+                with open(tlogname, 'w') as log_file:
+                    for i in range(X.shape[0]):
+                        for j in range(X.shape[1]):
+                            start_point = np.array([X[i, j], Y[i, j]])
+                            reached_max, iterations, height = ComGradAscent(start_point, n, r,Landscape=ComplexLandscape,Grad=ComplexLandscapeGrad) 
+                            results[i, j, 0], results[i, j, 1] = process(Iterations, Height)
+                            log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Iterations: {results[i, j, 0]}, Height: {results[i, j, 1]}\n")
+                            
+                                
+                plt.savefig(tpicname)
+                cyanSignal(f"Image saved as {tpicname}.")
+
+            # # 可视化是否到达最大值的图
+            # VisualizeResults(grid_x, grid_y, results[:, :, 0],str(choice_num)+'_max'+'_'+str(r)+'_'+str(n))
+            # 可视化达到最大值所需的迭代次数图
+            VisualizeResults(grid_x, grid_y, results[:, :, 0],str(choice_num)+'_numSteps_'+str(r)+'_'+str(n))
+            # 可视化达到的最高值
+            VisualizeResults(grid_x, grid_y, results[:, :, 1],str(choice_num)+'_height_'+str(r)+'_'+str(n))
 
 
-
-        results = {}
-
-        # 进行实验并记录每次的高度变化
-        for LRate in LRates:
-            for NumSteps in NumStepsList:
-                heights = []
-                for i in range(NumSteps):
-                    _, height = ComGradAscent_(start_points, NumSteps, LRate, ComplexLandscape, ComplexLandscapeGrad,
-                                              PauseFlag=0, Stop_early=False)
-                    heights.append(height)
-                results[(LRate, NumSteps)] = heights
-
-        # 转换 heights 为二维数组，确保符合 pcolormesh 的要求
-        LRates = np.array(LRates)
-        NumStepsList = np.array(NumStepsList)
-
-        plt.figure(figsize=(8, 6))
-        for idx, (LRate, NumSteps) in enumerate(results):
-            heights = np.array(results[(LRate, NumSteps)])
-
-            # 创建一个 NumSteps x len(LRates) 的二维数组
-            heights_2d = np.reshape(heights, (len(LRates), -1))
-
-            # 绘制每个组合的实验结果
-            plt.subplot(2, 2, idx + 1)
-            plt.pcolormesh(np.arange(NumSteps), LRates, heights_2d, shading='auto')
-            plt.colorbar()
-            plt.title(f"LRate={LRate}, NumSteps={NumSteps}")
-            plt.xlabel("Iteration")
-            plt.ylabel("Learning Rate")
-
-        plt.tight_layout()
-        plt.show()
-
+        # for LRate, NumSteps in zip(LRates, NumStepsList):
+        #     tpicname = './pic/'+choices[int(choice[0])]+'_'+str(LRate)+'_'+str(NumSteps)+'.png'
+        #     tlogname = './log/'+choices[int(choice[0])]+'_'+str(LRate)+'_'+str(NumSteps)+'.log'
+        #     with open(tlogname, 'w') as log_file:
+        #         H=None
+        #         # 选择多个随机起点，并运行梯度上升算法
+        #         for i in range(5):  # 从5个不同的起点开始
+        #             start_points = np.random.uniform(-2, 2, size=2)  # 随机生成起点，范围在[-2, 2]
+        #             log_file.write(f"Starting Point {i + 1}: {start_points}\n")  # 写入日志文件
+        #             print(f"Starting Point {i + 1}: {start_points}")
+        #             results = ComGradAscent(start_points, NumSteps, LRate, Landscape=ComplexLandscape, Grad=ComplexLandscapeGrad, PauseFlag=1)
+        #             #print('results: ',results)
+        #             if results is None:
+        #                 log_file.write("No optimal solution found.\n")
+        #                 print("No optimal solution found.")
+        #                 continue
+        #             else:
+        #                 reached_max, iterations,final_height = results
+        #                 H=final_height
+        #                 log_file.write("Max:"+str(final_height)+"\n")
+            
+        
+        #     # 使用pcolormesh总结结果，用函数colorbar生成刻度
+        #     plt.figure()
+            
+        #     if H is not None:
+        #         plt.pcolormesh(H)
+        #         plt.colorbar()
+        #         plt.savefig(tpicname)
+        #         cyanSignal(f"Image saved as {tpicname}.")
+        #     else:
+        #         print("No final height available for visualization.")
+            
 ## Exception handling
     elif choice[0]=='e':
         exit()
