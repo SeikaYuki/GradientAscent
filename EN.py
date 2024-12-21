@@ -129,7 +129,7 @@ def ComGradAscent(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=0, Stop_e
         StartPt = np.minimum(StartPt, [-3, 7])
         if height <= prev_height:
             if Stop_early:
-                return 1,NumSteps, height  # 返回1表示停止，返回当前的高度
+                return 1,NumSteps, height
         prev_height = height
 
     return 0,NumSteps, prev_height
