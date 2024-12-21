@@ -212,36 +212,34 @@ def main():
     
     ##【Task1】SimpleLandscape
     if choice[0]==choices[0][0]:
-        # 初始化起点，范围为(-2, 2)（简单地形）或(-3, 7)（复杂地形）
         StartPt = np.random.uniform(-2, 2, size=2)
-
-        # 运行梯度上升算法
         GradAscent(StartPt, NumSteps, LRate)
+
     ##【T1Q1】Random starting points
     elif choice[0]==choices[1][0]:
         with open(logname, 'w') as log_file:
-            # TODO: 选择多个随机起点，并运行梯度上升算法
-            for i in range(5):  # 从5个不同的起点开始
-                StartPt = np.random.uniform(-2, 2, size=2)  # 随机生成起点，范围在[-2, 2]
-                log_file.write(f"Starting Point {i + 1}: {StartPt}\n")  # 写入日志文件
+            # TODO: Choose random points and calculate
+            for i in range(5):  
+                StartPt = np.random.uniform(-2, 2, size=2)  
+                log_file.write(f"Starting Point {i + 1}: {StartPt}\n") 
                 print(f"Starting Point {i + 1}: {StartPt}")
                 GradAscent(StartPt, NumSteps, LRate)
     ##【T1Q2】GridTest &【T1Q3】Changing the learning rate
     elif choice[0]==choices[2][0] or choice[0]==choices[3][0]:
         ##【T1Q3】
         if choice[0] == choices[3][0]:
-            LRate = 0.05  # 学习率
+            LRate = 0.05  
 
         ## 2-T1Q2: Task1 Question2
-        ## 定义地形网格
-        grid_x = np.linspace(-2, 2, 10)  # 使用10个网格点覆盖x轴
-        grid_y = np.linspace(-2, 2, 10)  # 使用10个网格点覆盖y轴
+        ## Landscape
+        grid_x = np.linspace(-2, 2, 10) 
+        grid_y = np.linspace(-2, 2, 10) 
         X, Y = np.meshgrid(grid_x, grid_y)
 
-        ## 初始化结果存储
-        results = np.zeros(X.shape + (2,))  # 存储是否到达最大值和迭代次数
+        ## Initialize results list
+        results = np.zeros(X.shape + (2,))  
 
-        # 使用网格覆盖点进行梯度上升算法测试
+        ## Grid test
         with open(logname, 'w') as log_file:
             for i in range(X.shape[0]):
                 for j in range(X.shape[1]):
@@ -253,9 +251,8 @@ def main():
         plt.savefig(picname)
         cyanSignal(f"Image saved as {picname}.")
 
-        # 可视化是否到达最大值的图
+        ## Visualize the results
         VisualizeResults(grid_x, grid_y, results[:, :, 0],str(choice_num)+'_max')
-        # 可视化达到最大值所需的迭代次数图
         VisualizeResults(grid_x, grid_y, results[:, :, 1],str(choice_num)+'_numSteps_')
 
     ##【Task2】ComplexLandscape
@@ -266,9 +263,9 @@ def main():
             tpicname = './pic/'+choices[int(choice[0])]+'_'+str(y)+'.png'
             tlogname = './log/'+choices[int(choice[0])]+'_'+str(y)+'.log'
             with open(tlogname, 'w') as log_file:
-                # TODO: 选择多个随机起点，并运行梯度上升算法
-                for i in range(5):  # 从5个不同的起点开始
-                    StartPt = np.random.uniform(-2, 2, size=2)  # 随机生成起点，范围在[-2, 2]
+                # TODO: choose random dots and calculate
+                for i in range(5):  
+                    StartPt = np.random.uniform(-3, 7, size=2)  
                     log_file.write(f"Starting Point {i + 1}: {StartPt}\n")  # 写入日志文件
                     print(f"Starting Point {i + 1}: {StartPt}")
                     ComGradAscent(StartPt, NumSteps,
