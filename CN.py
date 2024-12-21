@@ -339,9 +339,10 @@ def main():
                             start_point = np.array([X[i, j], Y[i, j]])
                             reached_max, iterations, height = ComGradAscent(start_point, n, r,Landscape=ComplexLandscape,Grad=ComplexLandscapeGrad) 
                             results[i, j, 0], results[i, j, 1] = process(Iterations, Height)
-                            log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Iterations: {results[i, j, 0]}, Height: {results[i, j, 1]}\n")
+                            log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Iterations: {iterations}, Height: {height}\n")
                             
                                 
+
                 plt.savefig(tpicname)
                 cyanSignal(f"Image saved as {tpicname}.")
 
