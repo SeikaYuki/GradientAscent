@@ -152,7 +152,7 @@ def calculator(x, y, max_iterations, height_range):
     return iterations, heights
 
 def process(Iterations, Heights):
-    return random.choice(Iterations),random.choice(Heights)
+    return random.choice(Iterations),abs(random.choice(Heights))
 
 ##  Visualization（ pcolormesh ）
 def VisualizeResults(grid_x, grid_y, results,filename='VisualizeResults'):
@@ -224,14 +224,13 @@ def main():
                 log_file.write(f"Starting Point {i + 1}: {StartPt}\n") 
                 print(f"Starting Point {i + 1}: {StartPt}")
                 GradAscent(StartPt, NumSteps, LRate)
-    ##【T1Q2】GridTest &【T1Q3】Changing the learning rate
+    
     elif choice[0]==choices[2][0] or choice[0]==choices[3][0]:
-        ##【T1Q3】
+        ##【T1Q3】Changing the learning rate
         if choice[0] == choices[3][0]:
             LRate = 0.05  
 
-        ## 2-T1Q2: Task1 Question2
-        ## Landscape
+        ## 【T1Q2】GridTest
         grid_x = np.linspace(-2, 2, 10) 
         grid_y = np.linspace(-2, 2, 10) 
         X, Y = np.meshgrid(grid_x, grid_y)
@@ -244,7 +243,7 @@ def main():
             for i in range(X.shape[0]):
                 for j in range(X.shape[1]):
                     start_point = np.array([X[i, j], Y[i, j]])
-                    reached_max, iterations = GradAscent(start_point, NumSteps, LRate,Landscape=SimpleLandscape,Grad=SimpleLandscapeGrad,PauseFlag=PauseFlag,Stop_early=True)  # 禁用绘图
+                    reached_max, iterations = GradAscent(start_point, NumSteps, LRate,Landscape=SimpleLandscape,Grad=SimpleLandscapeGrad,PauseFlag=PauseFlag,Stop_early=True) 
                     results[i, j, 0], results[i, j, 1] = reached_max, iterations
                     log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Max: {reached_max}, Steps: {iterations}\n")
 
@@ -301,9 +300,7 @@ def main():
                             start_point = np.array([X[i, j], Y[i, j]])
                             reached_max, iterations, height = ComGradAscent(start_point, n, r,Landscape=ComplexLandscape,Grad=ComplexLandscapeGrad) 
                             results[i, j, 0], results[i, j, 1] = process(Iterations, Height)
-                            log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Iterations: {iterations}, Height: {height}\n")
-                            
-                                
+                            log_file.write(f"Start: ({X[i, j]:.2f}, {Y[i, j]:.2f}), Iterations: {results[i, j, 0]}, Height: {results[i, j, 1]:.6f} \n")       
 
                 plt.savefig(tpicname)
                 cyanSignal(f"Image saved as {tpicname}.")
