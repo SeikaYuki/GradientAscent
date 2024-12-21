@@ -157,7 +157,7 @@ def process(Iterations, Heights):
 ##  Visualization（ pcolormesh ）
 def VisualizeResults(grid_x, grid_y, results,filename='VisualizeResults'):
     fig, ax = plt.subplots()
-    result_matrix = np.array(results).reshape(len(grid_y), len(grid_x))  # 确保结果是二维的
+    result_matrix = np.array(results).reshape(len(grid_y), len(grid_x))
 
     ## pcolormesh
     c = ax.pcolormesh(grid_x, grid_y, result_matrix, shading='auto', cmap='viridis') # #'RdBu'
@@ -266,7 +266,7 @@ def main():
                 # TODO: choose random dots and calculate
                 for i in range(5):  
                     StartPt = np.random.uniform(-3, 7, size=2)  
-                    log_file.write(f"Starting Point {i + 1}: {StartPt}\n")  # 写入日志文件
+                    log_file.write(f"Starting Point {i + 1}: {StartPt}\n")
                     print(f"Starting Point {i + 1}: {StartPt}")
                     ComGradAscent(StartPt, NumSteps,
                                Landscape=ComplexLandscape,
