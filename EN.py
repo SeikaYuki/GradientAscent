@@ -27,6 +27,7 @@ def ComplexLandscape(x, y):
         - (1. / 3) * np.exp(-(x + 1)**2 - y**2)
         - 1 * (2 * (x - 3)**7 - 0.3 * (y - 4)**5 + (y - 3)**9) * np.exp(-(x - 3)**2 - (y - 3)**2)
     )
+
 def ComplexLandscapeGrad(x, y):
     g = np.zeros(2)  
     g[0] = (
@@ -46,6 +47,7 @@ def ComplexLandscapeGrad(x, y):
 ## SimpleLandscape & Grad
 def SimpleLandscape(x, y):
     return np.where(1 - np.abs(2 * x) > 0, 1 - np.abs(2 * x) + x + y, x + y)
+
 def SimpleLandscapeGrad(x, y):
     g = np.zeros(2)  
     if 1 - np.abs(2 * x) > 0:  
@@ -92,36 +94,31 @@ def GradAscent(StartPt, NumSteps, LRate,
     - steps: int, the number of steps taken.
     - height: float, the height (function value) at the final point.
     """
-    prev_height = -np.inf  # 初始设定为负无穷，确保第一次计算时一定会更新
+    prev_height = -np.inf  #initialize the previous height to negative infinity
     for i in range(NumSteps):
-        grad = SimpleLandscapeGrad(StartPt[0], StartPt[1])  # 计算当前点的梯度
-        height = SimpleLandscape(StartPt[0], StartPt[1])  # 计算当前点的高度
-        StartPt = StartPt + LRate * grad  # 根据梯度更新当前点
+        grad = SimpleLandscapeGrad(StartPt[0], StartPt[1])  # calculate the gradient at the current point
+        height = SimpleLandscape(StartPt[0], StartPt[1])  # calculate the height (function value) at the current point
+        StartPt = StartPt + LRate * grad  # updating the current point according to the grad
 
-        # 确保当前点在指定范围内
+        # check the range
         StartPt = np.maximum(StartPt, [-2, -2])
         StartPt = np.minimum(StartPt, [2, 2])
 
-        # 如果当前高度没有比前一步高，认为达到最大值，停止梯度上升
+        # stop early
         if height <= prev_height:
             print(f"Gradient ascent stopped at step {i + 1} (no improvement).")
             if Stop_early:
-                return 1, i, height   # 返回1表示找到了最大值，i表示步数
+                return 1, i, height   
+        prev_height = height  
 
-        # if height >= max_height:
-        #     return 1, i
-
-        prev_height = height  # 更新前一步的高度
-
-        # 在地形图上绘制当前点
         plt.plot(StartPt[0], StartPt[1], '*', markersize=10, color='red')
-        # 暂停以查看当前点
         if PauseFlag:
             plt.pause(0.1)
 
     print(f"No maximum found after {NumSteps} steps.")
     if Stop_early:
-        return 0, NumSteps,height   # 返回0表示未找到最大值，NumSteps表示总步数
+        return 0, NumSteps,height   
+
 def ComGradAscent(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=0, Stop_early=False):
     prev_height = -np.inf
     for i in range(NumSteps):
@@ -136,6 +133,7 @@ def ComGradAscent(StartPt, NumSteps, LRate, Landscape, Grad, PauseFlag=0, Stop_e
         prev_height = height
 
     return 0,NumSteps, prev_height
+
 def calculator(x, y, max_iterations, height_range):
     iterations = []
     heights = []
@@ -152,6 +150,7 @@ def calculator(x, y, max_iterations, height_range):
         iterations.append(int(current_iteration))
         heights.append(height)
     return iterations, heights
+
 def process(Iterations, Heights):
     return random.choice(Iterations),random.choice(Heights)
 
